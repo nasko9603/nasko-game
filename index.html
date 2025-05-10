@@ -2,40 +2,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Приключението на Наско</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Приключението на Наско</title>
+<style>
+    body { margin:0; overflow:hidden; background:#333; }
+    canvas { background:#222; display:block; margin:0 auto; }
+    #controls { position:fixed; bottom:20px; width:100%; text-align:center; }
+    button { width:60px; height:60px; margin:5px; font-size:20px; }
+</style>
 </head>
 <body>
-    <h1>Приключението на Наско</h1>
-    <p id="story">Добре дошъл в магическия свят!</p>
-    <button onclick="choose('1')">Тъмна гора</button>
-    <button onclick="choose('2')">Светеща пещера</button>
-    <button onclick="choose('3')">Разрушен храм</button>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+<div id="controls">
+    <button onclick="move('left')">←</button>
+    <button onclick="move('up')">↑</button>
+    <button onclick="move('down')">↓</button>
+    <button onclick="move('right')">→</button>
+    <button onclick="attack()">💥</button>
+</div>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+let player = { x: 50, y: 50, size: 30 };
+let monsters = [
+    { x: 200, y: 200, size: 30, alive: true },
+    { x: 300, y: 100, size: 30, alive: true }
+];
+let items = [
+    { x: 150, y: 150, size: 20, collected: false },
+    { x: 250, y: 250, size: 20, collected: false }
+];
+let score = 0;
 
-    <script>
-        let points = 0;
-        let lives = 3;
+function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(player.x, player.y, player.size, player.size);
 
-        function choose(path) {
-            let story = document.getElementById('story');
-            if (path === '1') {
-                story.innerText = "В гората те нападат вълци! Губиш живот.";
-                lives--;
-            } else if (path === '2') {
-                story.innerText = "Намираш съкровище!";
-                points++;
-            } else if (path === '3') {
-                story.innerText = "Попадаш в капан! Губиш живот.";
-                lives--;
-            }
-
-            if (points >= 3) {
-                story.innerText = "Браво! Спечели!";
-            } else if (lives <= 0) {
-                story.innerText = "Губиш! Опитай пак!";
-            } else {
-                story.innerText += `\nТочки: ${points}, Животи: ${lives}`;
-            }
+    monsters.forEach(monster => {
+        if (monster.alive) {
+            ctx.fillStyle = "red";
+            ctx.fillRect(monster.x, monster.y, monster.size, monster.size);
         }
-    </script>
+    });
+
+    items.forEach(item => {
+        if (!item.collected) {
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(item.x, item.y, item.size/2, 0, Math.PI*2);
+            ctx.fill();
+        }
+    });
+
+    ctx.fillStyle = "white";
+    ctx.fillText("Точки: " + score, 10, 10);
+}
+
+function move(dir) {
+    if (dir === 'left') player.x -= 10;
+    if (dir === 'right') player.x += 10;
+    if (dir === 'up') player.y -= 10;
+    if (dir === 'down') player.y += 10;
+    checkItems();
+    draw();
+}
+
+function attack() {
+    monsters.forEach(monster => {
+        let dx = monster.x - player.x;
+        let dy = monster.y - player.y;
+        if (Math.abs(dx) < 40 && Math.abs(dy) < 40) {
+            monster.alive = false;
+            score += 10;
+        }
+    });
+    draw();
+}
+
+function checkItems() {
+    items.forEach(item => {
+        let dx = item.x - player.x;
+        let dy = item.y - player.y;
+        if (!item.collected && Math.abs(dx) < 30 && Math.abs(dy) < 30) {
+            item.collected = true;
+            score +=5;
+        }
+    });
+}
+
+draw();
+</script>
 </body>
 </html>
