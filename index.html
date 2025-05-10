@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Приключението на Наско</title>
+</head>
+<body>
+    <h1>Приключението на Наско</h1>
+    <p id="story">Добре дошъл в магическия свят!</p>
+    <button onclick="choose('1')">Тъмна гора</button>
+    <button onclick="choose('2')">Светеща пещера</button>
+    <button onclick="choose('3')">Разрушен храм</button>
+
+    <script>
+        let points = 0;
+        let lives = 3;
+
+        function choose(path) {
+            let story = document.getElementById('story');
+            if (path === '1') {
+                story.innerText = "В гората те нападат вълци! Губиш живот.";
+                lives--;
+            } else if (path === '2') {
+                story.innerText = "Намираш съкровище!";
+                points++;
+            } else if (path === '3') {
+                story.innerText = "Попадаш в капан! Губиш живот.";
+                lives--;
+            }
+
+            if (points >= 3) {
+                story.innerText = "Браво! Спечели!";
+            } else if (lives <= 0) {
+                story.innerText = "Губиш! Опитай пак!";
+            } else {
+                story.innerText += `\nТочки: ${points}, Животи: ${lives}`;
+            }
+        }
+    </script>
+</body>
+</html>
